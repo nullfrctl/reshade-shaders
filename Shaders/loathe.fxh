@@ -4,6 +4,32 @@
 #include "ReShade.fxh"
 #include "ReShadeUI.fxh"
 
+#define sRGB 1
+
+// gamma for display.
+#ifndef DISPLAY_GAMMA
+#define DISPLAY_GAMMA sRGB
+#endif
+
+float3 sRGB_EOTF(float3 x)
+{
+  x = abs(x);
+  float3 y = x <= 0.0392857 ? x / 12.9232102 : pow((x + 0.055) / 1.055, 2.4);
+  return y;
+}
+
+float3 sRGB_OETF(float3 y)
+{
+  y = abs(y);
+  float3 x = y <= 0.0031308 ? y * 12.9232102 : 1.055 * pow(y, rcp(2.4)) - 0.055;
+  return x;
+}
+
+#if (DISPLAY_GAMMA == sRGB)
+  #define EOTF(x) (sRGB_EOTF(x))
+  #define OETF(x) (sRGB_OETF(x))
+#endif
+
 namespace loathe
 {
 
@@ -12,76 +38,81 @@ texture2D depthbuffer_texture: depth;
 
 sampler2D backbuffer
 {
-    Texture = backbuffer_texture;
+  Texture = backbuffer_texture;
 };
 
 sampler2D depthbuffer
 {
-    Texture = depthbuffer_texture;
+  Texture = depthbuffer_texture;
 };
 
 struct vs_t
 {
-    float4 position: sv_position;
-    float2 texcoord: texcoord;
+  float4 position: sv_position;
+  float2 texcoord: texcoord;
 };
 
 vs_t vs_quad(in uint id: sv_vertexid)
 {
-    vs_t vs;
+  vs_t vs;
 
-    vs.texcoord.x = (id == 2) ? 2.0 : 0.0;
-    vs.texcoord.y = (id == 1) ? 2.0 : 0.0;
-    vs.position = float4(vs.texcoord * float2(+2, -2) + float2(-1, +1), 0, 1);
+  vs.texcoord.x = (id == 2) ? 2.0 : 0.0;
+  vs.texcoord.y = (id == 1) ? 2.0 : 0.0;
+  vs.position = float4(vs.texcoord * float2(+2, -2) + float2(-1, +1), 0, 1);
 
-    return vs;
+  return vs;
 }
 
 float get_depth(in vs_t vs, in float far_plane)
 {
-    // vflip depth.
-    #if RESHADE_DEPTH_INPUT_IS_UPSIDE_DOWN
-    vs.texcoord.y = 1.0 - vs.texcoord.y;
-    #endif
+  // vflip depth.
+  #if RESHADE_DEPTH_INPUT_IS_UPSIDE_DOWN
+  vs.texcoord.y = 1.0 - vs.texcoord.y;
+  #endif
 
-    // scale depth.
-    #if (RESHADE_DEPTH_INPUT_X_SCALE && RESHADE_DEPTH_INPUT_Y_SCALE)
-    vs.texcoord.xy /= float2(RESHADE_DEPTH_INPUT_X_SCALE, RESHADE_DEPTH_INPUT_Y_SCALE);
-    #endif
+  // scale depth.
+  #if (RESHADE_DEPTH_INPUT_X_SCALE && RESHADE_DEPTH_INPUT_Y_SCALE)
+  vs.texcoord.xy /= float2(RESHADE_DEPTH_INPUT_X_SCALE, RESHADE_DEPTH_INPUT_Y_SCALE);
+  #endif
 
-    // pixel offsets.
-    #if (RESHADE_DEPTH_INPUT_X_PIXEL_OFFSET)
-    vs.texcoord.x -= RESHADE_DEPTH_INPUT_X_PIXEL_OFFSET * BUFFER_RCP_WIDTH;
-    #else
-    vs.texcoord.x -= RESHADE_DEPTH_INPUT_X_OFFSET * 0.5;
-    #endif
+  // pixel offsets.
+  #if (RESHADE_DEPTH_INPUT_X_PIXEL_OFFSET)
+  vs.texcoord.x -= RESHADE_DEPTH_INPUT_X_PIXEL_OFFSET * BUFFER_RCP_WIDTH;
+  #else
+  vs.texcoord.x -= RESHADE_DEPTH_INPUT_X_OFFSET * 0.5;
+  #endif
 
-    #if (RESHADE_DEPTH_INPUT_Y_PIXEL_OFFSET)
-    vs.texcoord.x -= RESHADE_DEPTH_INPUT_Y_PIXEL_OFFSET * BUFFER_RCP_HEIGHT;
-    #else
-    vs.texcoord.x -= RESHADE_DEPTH_INPUT_Y_OFFSET * 0.5;
-    #endif
+  #if (RESHADE_DEPTH_INPUT_Y_PIXEL_OFFSET)
+  vs.texcoord.x -= RESHADE_DEPTH_INPUT_Y_PIXEL_OFFSET * BUFFER_RCP_HEIGHT;
+  #else
+  vs.texcoord.x -= RESHADE_DEPTH_INPUT_Y_OFFSET * 0.5;
+  #endif
 
-    float depth = tex2Dlod(depthbuffer, float4(vs.texcoord.xy, 0, 0)).x * RESHADE_DEPTH_MULTIPLIER;
+  float depth = tex2Dlod(depthbuffer, float4(vs.texcoord.xy, 0, 0)).x;
+  
+  // multiplier
+  #if (RESHADE_DEPTH_MULTIPLIER)
+	depth *= RESHADE_DEPTH_MULTIPLIER;
+	#endif
 
-    // logarithmic.
-    #if (RESHADE_DEPTH_INPUT_IS_LOGARITHMIC)
-    depth = (exp(depth * log(0.01 + 1.0)) - 1.0) * 100.0;
-    #endif
+  // logarithmic depth.
+  #if (RESHADE_DEPTH_INPUT_IS_LOGARITHMIC)
+  depth = (exp(depth * log(0.01 + 1.0)) - 1.0) * 100.0;
+  #endif
 
-    // reverse depth.
-    #if (RESHADE_DEPTH_INPUT_IS_REVERSED)
-    depth = 1.0 - depth;
-    #endif
+  // reverse depth.
+  #if (RESHADE_DEPTH_INPUT_IS_REVERSED)
+  depth = 1.0 - depth;
+  #endif
 
-    depth /= far_plane - depth * (far_plane - 1.0);
+  depth /= far_plane - depth * (far_plane - 1.0);
 
-    return depth;
+  return depth;
 }
 
 float get_depth(in vs_t vs)
 {
-    return get_depth(vs, RESHADE_DEPTH_LINEARIZATION_FAR_PLANE);
+  return get_depth(vs, RESHADE_DEPTH_LINEARIZATION_FAR_PLANE);
 }
 
 }
