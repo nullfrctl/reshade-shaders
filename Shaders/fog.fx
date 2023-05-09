@@ -15,18 +15,20 @@ uniform float4 color < __UNIFORM_COLOR_FLOAT4
   ui_label = "Color";
 > = float4(1.0, 1.0, 1.0, 1.0);
 
+UI_MESSAGE(help, __preprocessor_help_text__);
+
 }
 
 float3 ps_main(in loathe::vs_t vs): sv_target
 {
   float3 color = tex2D(loathe::backbuffer, vs.texcoord.xy).rgb;
-  color = EOTF(color);
+  color = signal_to_linear(color);
 
   float depth = loathe::get_depth(vs, ui::far_plane);
 
   color = lerp(color, ui::color.rgb, depth.rrr * ui::color.a);
 
-  color = OETF(color);
+  color = linear_to_signal(color);
   return color;
 }
 
