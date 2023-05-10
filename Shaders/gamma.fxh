@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: CC-BY-NC-SA-4.0+
 
-/* License for sRGB and Rec709 transfer functions: 
+/* License for sRGB, Rec709, Cineon Log transfer functions: 
 <<
 Copyright 2013 Colour Developers
 All rights reserved.
@@ -55,7 +55,6 @@ namespace loathe
 
 namespace _sRGB
 {
-
 float3 inverse_EOTF(float3 y)
 {
   y = abs(y);
@@ -69,7 +68,6 @@ float3 EOTF(float3 x)
   float3 y = inverse_EOTF(0.0031308) >= x ? x / 12.9232102 : pow((x + 0.055) / 1.055, 2.4);
   return y;
 }
-
 }
 
 namespace _Rec709
@@ -94,15 +92,50 @@ float3 inverse_OETF(float3 V)
 
 }
 
+namespace gamma
+{
 #if (DISPLAY_GAMMA == sRGB)
-  #define signal_to_linear(x) (::loathe::_sRGB::EOTF(x))
-  #define linear_to_signal(x) (::loathe::_sRGB::inverse_EOTF(x))
+  float3 signal_to_linear(float3 x) { return ::loathe::_sRGB::EOTF(x); }
+  float3 linear_to_signal(float3 x) { return ::loathe::_sRGB::inverse_EOTF(x); }
 #elif (DISPLAY_GAMMA == Rec709)
-  #define signal_to_linear(x) (::loathe::_Rec709::inverse_OETF(x))
-  #define linear_to_signal(x) (::loathe::_Rec709::OETF(x))
+  float3 signal_to_linear(float3 x) { return ::loathe::_Rec709::inverse_OETF(x); }
+  float3 linear_to_signal(float3 x) { return ::loathe::_Rec709::OETF(x); }
 #else
-  #define signal_to_linear(x) (pow(x, DISPLAY_GAMMA * 0.1))
-  #define linear_to_signal(x) (pow(x, rcp(DISPLAY_GAMMA * 0.1)))
+  float3 signal_to_linear(x) { return pow(x, DISPLAY_GAMMA * 0.1); }
+  float3 linear_to_signal(x) { return pow(x, rcp(DISPLAY_GAMMA * 0.1)); }
 #endif
+}
+
+namespace log
+{
+
+// precalculated in python. only use to get 100% accurate cineon log, otherwise useless.
+static const float cineon_black_offset = 0.0107977516232771;
+
+float3 encode_cineon(float3 x, float black_offset)
+{
+  float3 y = (685.0 + 300.0 * log10(x * (1.0 - black_offset) + black_offset)) / 1023.0;
+
+  return y;
+}
+
+float3 encode_cineon(float3 x)
+{
+  return encode_cineon(x, 0.0);
+}
+
+float3 decode_cineon(float3 y, float black_offset)
+{
+  float3 x = pow(10.0, ((1023.0 * y - 685.0) / 300.0) - black_offset) / (1.0 - black_offset);
+
+  return x;
+}
+
+float3 decode_cineon(float3 x)
+{
+  return decode_cineon(x, 0.0);
+}
+
+}
 
 }

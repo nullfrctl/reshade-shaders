@@ -23,13 +23,12 @@ UI_MESSAGE(help, __preprocessor_help_text__);
 float3 ps_main(in loathe::vs_t vs): sv_target
 {
   float3 color = tex2D(loathe::backbuffer, vs.texcoord.xy).rgb;
-  color = signal_to_linear(color);
+  color = loathe::gamma::signal_to_linear(color);
 
   float depth = loathe::get_depth(vs, ui::far_plane);
-
   color = lerp(color, ui::color.rgb, depth.rrr * ui::color.a);
 
-  color = linear_to_signal(color);
+  color = loathe::gamma::linear_to_signal(color);
   return color;
 }
 
