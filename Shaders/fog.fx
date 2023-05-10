@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: CC-BY-NC-SA-4.0+
 
 #include "loathe.fxh"
+#include "gamma.fxh"
 
 namespace ui
 {
