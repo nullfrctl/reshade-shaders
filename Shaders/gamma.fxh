@@ -57,15 +57,15 @@ namespace _sRGB
 {
 float3 inverse_EOTF(float3 y)
 {
-  y = abs(y);
-  float3 x = y <= 0.0031308 ? y * 12.9232102 : 1.055 * pow(y, rcp(2.4)) - 0.055;
+  y = saturate(y);
+  float3 x = y <= 0.0031308 ? y * 12.92 : 1.055 * pow(y, rcp(2.4)) - 0.055;
   return x;
 }
 
 float3 EOTF(float3 x)
 {
-  x = abs(x);
-  float3 y = inverse_EOTF(0.0031308) >= x ? x / 12.9232102 : pow((x + 0.055) / 1.055, 2.4);
+  x = saturate(x);
+  float3 y = 0.0404499359 >= x ? x / 12.9232102 : pow((x + 0.055) / 1.055, 2.4);
   return y;
 }
 }
@@ -75,7 +75,7 @@ namespace _Rec709
 
 float3 OETF(float3 L)
 {
-  L = abs(L);
+  L = saturate(L);
   float3 V = L < 0.018053968510807 ? L * 4.5 : 1.099296826809442 * pow(L, rcp(2.2)) - 0.099296826809442;
 
   return V;
@@ -83,8 +83,7 @@ float3 OETF(float3 L)
 
 float3 inverse_OETF(float3 V)
 {
-  V = abs(V);
-  // controversial: maybe 0.18, maybe 0.81...
+  V = saturate(V);
   float3 L = V < (0.018053968510807 * 4.5) ? V / 4.5 : pow((V + 0.099296826809442) / 1.099296826809442, 2.2);
 
   return L;
@@ -109,19 +108,18 @@ namespace gamma
 namespace log
 {
 
-// precalculated in python. only use to get 100% accurate cineon log, otherwise useless.
-static const float cineon_black_offset = 0.0107977516232771;
+static const float cineon_black_offset = 0.0108;
 
 float3 encode_cineon(float3 x, float black_offset)
 {
   float3 y = (685.0 + 300.0 * log10(x * (1.0 - black_offset) + black_offset)) / 1023.0;
 
-  return y;
+  return saturate(y);
 }
 
 float3 encode_cineon(float3 x)
 {
-  return encode_cineon(x, 0.0);
+  return encode_cineon(x, cineon_black_offset);
 }
 
 float3 decode_cineon(float3 y, float black_offset)
@@ -133,7 +131,7 @@ float3 decode_cineon(float3 y, float black_offset)
 
 float3 decode_cineon(float3 x)
 {
-  return decode_cineon(x, 0.0);
+  return decode_cineon(x, cineon_black_offset);
 }
 
 }
