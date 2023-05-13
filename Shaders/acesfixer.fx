@@ -75,14 +75,14 @@ namespace loathe
 
   float3 inverse_tonemap(float3 color)
   {
-    float3 acescct = tex3D(lut, color.rgb, 32, 0).rgb;
+    float3 acescct = tex3Dhoriz(lut, color.rgb, 32, 0).rgb;
     return ACEScct_to_linear(acescct);
   }
 
   float3 tonemap(float3 acescg)
   {
     float3 acescct = linear_to_ACEScct(acescg);
-    return tex3D(lut, acescct.rgb, 32, 1).rgb;
+    return tex3Dhoriz(lut, acescct.rgb, 32, 1).rgb;
   }
 
   float3 ps_main(vs_t vs): sv_target
