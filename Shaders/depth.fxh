@@ -6,7 +6,7 @@ namespace loathe
 {
   namespace depth
   {
-    float get_depth(float2 texcoord, in float far_plane)
+    float get_depth(float2 texcoord, float far_plane)
     {
       // vflip depth.
       #if RESHADE_DEPTH_INPUT_IS_UPSIDE_DOWN
