@@ -6,45 +6,46 @@
 
 #define _m(a,b) a##b
 #define _s(a) #a
-#define NULL (0)
-
 #define _n "\n"
-#define UI_MESSAGE(_name, _text) uniform int _m(message, _name) < __UNIFORM_RADIO_INT1 ui_label = " "; ui_text = "\n" _text; > = NULL
+
+#define NULL 0
+#define TINY 1e-8
+
+#define UI_MESSAGE(_name, _text) uniform int _m(message, _name) < __UNIFORM_RADIO_INT1 ui_label = " "; ui_text = _n _text; > = NULL
 
 namespace loathe
 {
+  texture2D backbuffer_texture: color;
+  texture2D depthbuffer_texture: depth;
 
-texture2D backbuffer_texture: color;
-texture2D depthbuffer_texture: depth;
+  sampler2D backbuffer
+  {
+    Texture = backbuffer_texture;
+  };
 
-sampler2D backbuffer
-{
-  Texture = backbuffer_texture;
-};
+  sampler2D depthbuffer
+  {
+    Texture = depthbuffer_texture;
+  };
 
-sampler2D depthbuffer
-{
-  Texture = depthbuffer_texture;
-};
+  struct vs_t
+  {
+    float4 position: sv_position;
+    float2 texcoord: texcoord;
+  };
 
-struct vs_t
-{
-  float4 position: sv_position;
-  float2 texcoord: texcoord;
-};
+  vs_t vs_quad(uint id: sv_vertexid)
+  {
+    vs_t vs;
 
-vs_t vs_quad(in uint id: sv_vertexid)
-{
-  vs_t vs;
+    vs.texcoord.x = (id == 2) ? 2.0 : 0.0;
+    vs.texcoord.y = (id == 1) ? 2.0 : 0.0;
+    vs.position = float4(vs.texcoord * float2(+2, -2) + float2(-1, +1), 0, 1);
 
-  vs.texcoord.x = (id == 2) ? 2.0 : 0.0;
-  vs.texcoord.y = (id == 1) ? 2.0 : 0.0;
-  vs.position = float4(vs.texcoord * float2(+2, -2) + float2(-1, +1), 0, 1);
+    return vs;
+  }
 
-  return vs;
-}
-
-float get_depth(in float2 texcoord, in float far_plane)
+float get_depth(float2 texcoord, float far_plane)
 {
   // vflip depth.
   #if RESHADE_DEPTH_INPUT_IS_UPSIDE_DOWN
@@ -91,7 +92,7 @@ float get_depth(in float2 texcoord, in float far_plane)
   return depth;
 }
 
-float get_depth(in float2 texcoord)
+float get_depth(float2 texcoord)
 {
   return get_depth(texcoord, RESHADE_DEPTH_LINEARIZATION_FAR_PLANE);
 }

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CC-BY-NC-SA-4.0+
 
-/* License for sRGB, Rec709, Cineon Log transfer functions: 
-<<
+/* License for sRGB, Rec709 transfer functions: 
+
 Copyright 2013 Colour Developers
 All rights reserved.
 
@@ -26,7 +26,6 @@ LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
 ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
->> 
 */ 
 
 #pragma once
@@ -42,98 +41,62 @@ _n \
 "Currently only sRGB (61966) and Rec709 (709) are implemented" _n \
 "If you use a TV, input 'Rec709'. If you use a monitor, input 'sRGB'."
 
-// gamma for display.
 #define sRGB 61966 // IEC 61966-2-1:1999
 #define Rec709 709 // ITU-R BT.709
 
 #ifndef DISPLAY_GAMMA
-  #define DISPLAY_GAMMA sRGB // can also be Rec709
+  #define DISPLAY_GAMMA sRGB
 #endif
 
 namespace loathe
 {
+  namespace _sRGB
+  {
+    float3 inverse_EOTF(float3 y)
+    {
+      y = saturate(y);
+      float3 x = y <= 0.0031308 ? y * 12.92 : 1.055 * pow(y, rcp(2.4)) - 0.055;
+      return x;
+    }
 
-namespace _sRGB
-{
-float3 inverse_EOTF(float3 y)
-{
-  y = saturate(y);
-  float3 x = y <= 0.0031308 ? y * 12.92 : 1.055 * pow(y, rcp(2.4)) - 0.055;
-  return x;
-}
+    float3 EOTF(float3 x)
+    {
+      x = saturate(x);
+      float3 y = 0.0404499359 >= x ? x / 12.9232102 : pow((x + 0.055) / 1.055, 2.4);
+      return y;
+    }
+  } // namespace _sRGB
 
-float3 EOTF(float3 x)
-{
-  x = saturate(x);
-  float3 y = 0.0404499359 >= x ? x / 12.9232102 : pow((x + 0.055) / 1.055, 2.4);
-  return y;
-}
-}
+  namespace _Rec709
+  {
+    float3 OETF(float3 L)
+    {
+      L = saturate(L);
+      float3 V = L < 0.018053968510807 ? L * 4.5 : 1.099296826809442 * pow(L, rcp(2.2)) - 0.099296826809442;
 
-namespace _Rec709
-{
+      return V;
+    }
 
-float3 OETF(float3 L)
-{
-  L = saturate(L);
-  float3 V = L < 0.018053968510807 ? L * 4.5 : 1.099296826809442 * pow(L, rcp(2.2)) - 0.099296826809442;
+    float3 inverse_OETF(float3 V)
+    {
+      V = saturate(V);
+      float3 L = V < (0.018053968510807 * 4.5) ? V / 4.5 : pow((V + 0.099296826809442) / 1.099296826809442, 2.2);
 
-  return V;
-}
+      return L;
+    }
+  } // namespace _Rec709
 
-float3 inverse_OETF(float3 V)
-{
-  V = saturate(V);
-  float3 L = V < (0.018053968510807 * 4.5) ? V / 4.5 : pow((V + 0.099296826809442) / 1.099296826809442, 2.2);
-
-  return L;
-}
-
-}
-
-namespace gamma
-{
-#if (DISPLAY_GAMMA == sRGB)
-  float3 signal_to_linear(float3 x) { return ::loathe::_sRGB::EOTF(x); }
-  float3 linear_to_signal(float3 x) { return ::loathe::_sRGB::inverse_EOTF(x); }
-#elif (DISPLAY_GAMMA == Rec709)
-  float3 signal_to_linear(float3 x) { return ::loathe::_Rec709::inverse_OETF(x); }
-  float3 linear_to_signal(float3 x) { return ::loathe::_Rec709::OETF(x); }
-#else
-  float3 signal_to_linear(x) { return pow(x, DISPLAY_GAMMA * 0.1); }
-  float3 linear_to_signal(x) { return pow(x, rcp(DISPLAY_GAMMA * 0.1)); }
-#endif
-}
-
-namespace log
-{
-
-static const float cineon_black_offset = 0.0108;
-
-float3 encode_cineon(float3 x, float black_offset)
-{
-  float3 y = (685.0 + 300.0 * log10(x * (1.0 - black_offset) + black_offset)) / 1023.0;
-
-  return saturate(y);
-}
-
-float3 encode_cineon(float3 x)
-{
-  return encode_cineon(x, cineon_black_offset);
-}
-
-float3 decode_cineon(float3 y, float black_offset)
-{
-  float3 x = pow(10.0, ((1023.0 * y - 685.0) / 300.0) - black_offset) / (1.0 - black_offset);
-
-  return x;
-}
-
-float3 decode_cineon(float3 x)
-{
-  return decode_cineon(x, cineon_black_offset);
-}
-
-}
-
-}
+  namespace gamma
+  {
+  #if (DISPLAY_GAMMA == sRGB)
+    float3 signal_to_linear(float3 x) { return ::loathe::_sRGB::EOTF(x); }
+    float3 linear_to_signal(float3 x) { return ::loathe::_sRGB::inverse_EOTF(x); }
+  #elif (DISPLAY_GAMMA == Rec709)
+    float3 signal_to_linear(float3 x) { return ::loathe::_Rec709::inverse_OETF(x); }
+    float3 linear_to_signal(float3 x) { return ::loathe::_Rec709::OETF(x); }
+  #else
+    float3 signal_to_linear(x) { return pow(x, DISPLAY_GAMMA * 0.1); }
+    float3 linear_to_signal(x) { return pow(x, rcp(DISPLAY_GAMMA * 0.1)); }
+  #endif
+  } // namespace gamma
+} // namespace loathe
