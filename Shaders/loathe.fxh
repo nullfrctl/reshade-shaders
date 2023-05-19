@@ -4,12 +4,16 @@
 #include "ReShade.fxh"
 #include "ReShadeUI.fxh"
 
-#define _m(a,b) a##b
-#define _s(a) #a
+#define _m(_a,_b) _a##_b
+#define _s(_a) #_a
 #define _n "\n"
 
 #define NULL 0
 #define TINY 1e-8
+
+#define sum(_v)  (dot((_v),1.0))
+#define linearstep(_min,_max,_x) (saturate(((_x) - (_min)) * rcp((_max) - (_min))))
+#define where(_cond,_a,_b) ((_cond)?(_a):(_b))
 
 #define UI_MESSAGE(_name, _text) uniform int _m(message, _name) < __UNIFORM_RADIO_INT1 ui_label = " "; ui_text = _n _text; > = NULL
 

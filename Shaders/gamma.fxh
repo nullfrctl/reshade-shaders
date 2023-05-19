@@ -38,11 +38,14 @@ _n \
 "You can also input a custom gamma through a 2-digit " _n \
 "number (e.g. 24 for 2.4, 10 for 1.0/linear)" _n \
 _n \
-"Currently only sRGB (61966) and Rec709 (709) are implemented" _n \
+"sRGB, Rec601, Rec709, Rec2020, and Rec2100 are currently supported." _n \
 "If you use a TV, input 'Rec709'. If you use a monitor, input 'sRGB'."
 
 #define sRGB 61966 // IEC 61966-2-1:1999
+#define Rec601 601 // ITU-R BT.601
 #define Rec709 709 // ITU-R BT.709
+#define Rec2020 2020 // ITU-R BT.2020
+#define Rec2100 2100 // ITU-R BT.2100
 
 #ifndef DISPLAY_GAMMA
   #define DISPLAY_GAMMA sRGB
@@ -67,7 +70,7 @@ namespace loathe
     }
   } // namespace _sRGB
 
-  namespace _Rec709
+  namespace _Rec601
   {
     float3 OETF(float3 L)
     {
@@ -91,12 +94,15 @@ namespace loathe
   #if (DISPLAY_GAMMA == sRGB)
     float3 signal_to_linear(float3 x) { return ::loathe::_sRGB::EOTF(x); }
     float3 linear_to_signal(float3 x) { return ::loathe::_sRGB::inverse_EOTF(x); }
-  #elif (DISPLAY_GAMMA == Rec709)
-    float3 signal_to_linear(float3 x) { return ::loathe::_Rec709::inverse_OETF(x); }
-    float3 linear_to_signal(float3 x) { return ::loathe::_Rec709::OETF(x); }
+  #elif (DISPLAY_GAMMA == Rec601)
+    float3 signal_to_linear(float3 x) { return ::loathe::_Rec601::EOTF(x); }
+    float3 linear_to_signal(float3 x) { return ::loathe::_Rec601::inverse_EOTF(x); }
+  #elif (DISPLAY_GAMMA == Rec709 || DISPLAY_GAMMA == Rec2020 || DISPLAY_GAMMA == Rec2100)
+    float3 signal_to_linear(x) { return pow(saturate(x), 2.4); }
+    float3 linear_to_signal(x) { return pow(saturate(x), rcp(2.4)); }
   #else
-    float3 signal_to_linear(x) { return pow(x, DISPLAY_GAMMA * 0.1); }
-    float3 linear_to_signal(x) { return pow(x, rcp(DISPLAY_GAMMA * 0.1)); }
+    float3 signal_to_linear(x) { return pow(saturate(x), DISPLAY_GAMMA * 0.1); }
+    float3 linear_to_signal(x) { return pow(saturate(x), rcp(DISPLAY_GAMMA * 0.1)); }
   #endif
   } // namespace gamma
 } // namespace loathe
