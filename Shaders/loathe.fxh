@@ -34,7 +34,12 @@ namespace loathe
 
   float4 tex2Dlod(sampler2D s, float2 t, float m)
   {
+    // stuff 4 HLSL tools.
+    #ifdef __INTELLISENSE__
+    return NULL;
+    #else
     return tex2Dlod(s, float4(t, 0, m));
+    #endif
   }
 
   struct vs_t
