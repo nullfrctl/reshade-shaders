@@ -43,8 +43,8 @@ namespace loathe {
   vs_t vs_quad(uint id : sv_vertexid) {
     vs_t vs;
 
-    vs.texcoord.x = (id == 2) ? 2.0 : 0.0;
-    vs.texcoord.y = (id == 1) ? 2.0 : 0.0;
+    vs.texcoord.x = id == 2 ? 2.0 : 0.0;
+    vs.texcoord.y = id == 1 ? 2.0 : 0.0;
     vs.position = float4(vs.texcoord * float2(+2, -2) + float2(-1, +1), 0, 1);
 
     return vs;
