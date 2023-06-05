@@ -8,6 +8,10 @@
 #define TINY (1e-8)
 
 #define where(_c, _x, _y) ((_c) ? (_x) : (_y))
+#define linearstep(_min, _max, _x) (saturate(((_x) - (_min)) / ((_max) - (_min))))
+
+// precise-ish approx of pow(10,x)
+#define exp10(_x) (exp2((_x)*3.321928095))
 
 namespace loathe {
   texture2D backbuffer_texture : color;
@@ -21,7 +25,8 @@ namespace loathe {
     float2 texcoord : texcoord;
   };
 
-  vs_t vs_quad(uint id : sv_vertexid) {
+  vs_t vs_quad(uint id
+               : sv_vertexid) {
     vs_t vs;
 
     vs.texcoord.x = id == 2 ? 2.0 : 0.0;

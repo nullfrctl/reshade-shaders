@@ -89,6 +89,10 @@ namespace loathe {
   float3 ps_main(vs_t vs) : sv_target {
     float3 color = saturate(tex2D(backbuffer, vs.texcoord.xy).rgb);
 
+    if (all(color == 0.0) || all(color == 1.0)) {
+      discard;
+    }
+
     [branch] switch (ui::input_gamma) {
     case 0: // sRGB
       color = gamma::_sRGB::EOTF(color);
