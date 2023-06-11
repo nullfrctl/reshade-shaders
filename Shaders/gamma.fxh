@@ -6,8 +6,10 @@
 #define Rec709 709
 #define Rec2020 2020
 
-#if !defined(DISPLAY_GAMMA) && !defined(_LOATHE_NO_DISP_GAMMA)
+#ifndef DISPLAY_GAMMA
+#ifndef _LOATHE_NO_DISP_GAMMA
 #define DISPLAY_GAMMA sRGB
+#endif
 #endif
 
 namespace loathe {

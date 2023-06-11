@@ -89,7 +89,7 @@ namespace loathe {
   float3 ps_main(vs_t vs) : sv_target {
     float3 color = saturate(tex2D(backbuffer, vs.texcoord.xy).rgb);
 
-    if (all(color == 0.0) || all(color == 1.0)) {
+    if (all(color == 0.0) || all(color == 1.0) || ui::input_gamma == ui::output_gamma) {
       discard;
     }
 
