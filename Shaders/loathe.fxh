@@ -19,11 +19,16 @@ namespace loathe {
   sampler2D backbuffer { Texture = backbuffer_texture; };
   sampler2D depthbuffer { Texture = depthbuffer_texture; };
 
+  sampler2D linear_backbuffer {
+    Texture = backbuffer_texture;
+    SRGBTexture = true;
+  };
+
   struct vs_t {
     float4 position : sv_position;
     float2 texcoord : texcoord;
   };
-  
+
   vs_t vs_quad(uint id
                : sv_vertexid) {
     vs_t vs;
