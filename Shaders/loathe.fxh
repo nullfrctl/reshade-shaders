@@ -9,6 +9,7 @@
 
 #define where(_c, _x, _y) ((_c) ? (_x) : (_y))
 #define linearstep(_min, _max, _x) (saturate(((_x) - (_min)) / ((_max) - (_min))))
+#define cbrt(_x) (sign(_x) * pow(abs(_x), rcp(3.0)))
 
 #define exp10(_x) (exp2((_x)*3.321928095))
 
