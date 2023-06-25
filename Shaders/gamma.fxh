@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: CC-BY-NC-SA-4.0+
+// SPDX-License-Identifier: GPL-3.0-or-later
 
 #pragma once
 #include "loathe.fxh"
@@ -22,12 +22,12 @@ namespace loathe {
     namespace _sRGB {
       float3 EOTF(float3 x) {
         x = saturate(x);
-        return where(0.03928571429 >= x, x / 12.92321018, pow((x + 0.055) / 1.055, 2.4));
+        return std::where(0.03928571429 >= x, x / 12.92321018, pow((x + 0.055) / 1.055, 2.4));
       }
 
       float3 inverse_EOTF(float3 y) {
         y = saturate(y);
-        return where(0.00303993464 >= y, y * 12.92321018, 1.055 * pow(y, rcp_24) - 0.055);
+        return std::where(0.00303993464 >= y, y * 12.92321018, 1.055 * pow(y, rcp_24) - 0.055);
       }
     } // namespace _sRGB
 

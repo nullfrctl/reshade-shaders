@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: CC-BY-NC-SA-4.0+
+// SPDX-License-Identifier: GPL-3.0-or-later
 
 #pragma once
 #include "ReShade.fxh"
@@ -7,24 +7,18 @@
 #define NULL (0)
 #define TINY (1e-8)
 
-#define where(_c, _x, _y) ((_c) ? (_x) : (_y))
-#define linearstep(_min, _max, _x) (saturate(((_x) - (_min)) / ((_max) - (_min))))
-#define cbrt(_x) (sign(_x) * pow(abs(_x), rcp(3.0)))
-
-#define exp10(_x) (exp2((_x)*3.321928095))
-
 namespace loathe {
   namespace std {
+    float where(bool cond, float x, float y) { return cond ? x : y; }
+    float2 where(bool2 cond, float2 x, float2 y) { return cond ? x : y; }
+    float3 where(bool3 cond, float3 x, float3 y) { return cond ? x : y; }
+    float4 where(bool4 cond, float4 x, float4 y) { return cond ? x : y; }
+
     texture2D backbuffer_texture : color;
     texture2D depthbuffer_texture : depth;
 
     sampler2D backbuffer { Texture = backbuffer_texture; };
     sampler2D depthbuffer { Texture = depthbuffer_texture; };
-
-    sampler2D linear_backbuffer {
-      Texture = backbuffer_texture;
-      SRGBTexture = true;
-    };
 
     struct vs_t {
       float4 position : sv_position;
@@ -42,20 +36,20 @@ namespace loathe {
       return vs;
     }
 
-    float3x3 inverse(const float3x3 m) {
-      float3x3 adjugate;
-      adjugate[0][0] = (m[1][1] * m[2][2] - m[1][2] * m[2][1]);
-      adjugate[0][1] = -(m[0][1] * m[2][2] - m[0][2] * m[2][1]);
-      adjugate[0][2] = (m[0][1] * m[1][2] - m[0][2] * m[1][1]);
-      adjugate[1][0] = -(m[1][0] * m[2][2] - m[1][2] * m[2][0]);
-      adjugate[1][1] = (m[0][0] * m[2][2] - m[0][2] * m[2][0]);
-      adjugate[1][2] = -(m[0][0] * m[1][2] - m[0][2] * m[1][0]);
-      adjugate[2][0] = (m[1][0] * m[2][1] - m[1][1] * m[2][0]);
-      adjugate[2][1] = -(m[0][0] * m[2][1] - m[0][1] * m[2][0]);
-      adjugate[2][2] = (m[0][0] * m[1][1] - m[0][1] * m[1][0]);
+    float3x3 inverse(const float3x3 M) {
+      float3x3 adj;
+      adj[0][0] = (M[1][1] * M[2][2] - M[1][2] * M[2][1]);
+      adj[0][1] = -(M[0][1] * M[2][2] - M[0][2] * M[2][1]);
+      adj[0][2] = (M[0][1] * M[1][2] - M[0][2] * M[1][1]);
+      adj[1][0] = -(M[1][0] * M[2][2] - M[1][2] * M[2][0]);
+      adj[1][1] = (M[0][0] * M[2][2] - M[0][2] * M[2][0]);
+      adj[1][2] = -(M[0][0] * M[1][2] - M[0][2] * M[1][0]);
+      adj[2][0] = (M[1][0] * M[2][1] - M[1][1] * M[2][0]);
+      adj[2][1] = -(M[0][0] * M[2][1] - M[0][1] * M[2][0]);
+      adj[2][2] = (M[0][0] * M[1][1] - M[0][1] * M[1][0]);
 
-      float determinant = dot(float3(adjugate[0][0], adjugate[0][1], adjugate[0][2]), float3(m[0][0], m[1][0], m[2][0]));
-      return adjugate * rcp(determinant + (abs(determinant) < TINY));
+      float determinant = dot(float3(adj[0][0], adj[0][1], adj[0][2]), float3(M[0][0], M[1][0], M[2][0]));
+      return adj * rcp(determinant + (abs(determinant) < TINY));
     }
 
     float3x3 diag(const float3 V) {

@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 #pragma once
 #include "CIE_1931.fxh"
 #include "loathe.fxh"
@@ -21,12 +23,10 @@ namespace loathe {
       float3x3 xy_to_xyY(float4x2 coords_xy) {
         float3 white_XYZ = CIE_1931::xyY_to_XYZ(float3(coords_xy[3], 1.0));
 
-        // xc/yc
         float3 X_prime = float3(coords_xy[0].x / coords_xy[0].y,
                                 coords_xy[1].x / coords_xy[1].y,
                                 coords_xy[2].x / coords_xy[2].y);
 
-        // (1 - xc - yc) / yc
         float3 Z_prime = float3(CIE_1931::xy_to_z(coords_xy[0]) / coords_xy[0].y,
                                 CIE_1931::xy_to_z(coords_xy[1]) / coords_xy[1].y,
                                 CIE_1931::xy_to_z(coords_xy[2]) / coords_xy[2].y);
