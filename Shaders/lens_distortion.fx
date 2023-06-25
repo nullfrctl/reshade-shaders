@@ -36,7 +36,7 @@ namespace loathe {
     return rcp(f) * ui::scale;
   }
 
-  float3 ps_gzdoom(vs_t vs) : sv_target {
+  float3 ps_gzdoom(std::vs_t vs) : sv_target {
     const float3 k = float3(ui::k, ui::k * ui::chromatic, ui::k * ui::chromatic * ui::chromatic);
     const float3 kcube = float3(ui::kcube, ui::kcube * ui::chromatic, ui::kcube * ui::chromatic * ui::chromatic);
 
@@ -46,14 +46,14 @@ namespace loathe {
     float r2 = dot(p, p);
     float3 f = 1.0 + r2 * (k + kcube * sqrt(r2));
 
-    float scale = get_scale(k, kcube);
+    const float scale = get_scale(k, kcube);
     float3 x = f * position.x * scale + 0.5;
     float3 y = f * position.y * scale + 0.5;
 
     float3 color;
-    color.r = tex2D(linear_backbuffer, float2(x.r, y.r)).r;
-    color.g = tex2D(linear_backbuffer, float2(x.g, y.g)).g;
-    color.b = tex2D(linear_backbuffer, float2(x.b, y.b)).b;
+    color.r = tex2D(std::backbuffer, float2(x.r, y.r)).r;
+    color.g = tex2D(std::backbuffer, float2(x.g, y.g)).g;
+    color.b = tex2D(std::backbuffer, float2(x.b, y.b)).b;
 
     return color;
   }
@@ -62,8 +62,7 @@ namespace loathe {
   > {
     pass {
       PixelShader = ps_gzdoom;
-      VertexShader = vs_quad;
-      SRGBWriteEnable = true;
+      VertexShader = std::vs_quad;
     }
   }
 } // namespace loathe
