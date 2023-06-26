@@ -7,6 +7,16 @@
 #define NULL (0)
 #define TINY (1e-8)
 
+#define NL " \n "
+
+// format for most things (headers, tooltips, text, etc.)
+#define FORMAT(_str) NL _str NL
+
+// spacing control; use in ui_spacing = width
+#define THIN 1
+#define REGULAR 3
+#define WIDE 5
+
 namespace std {
   float where(bool cond, float x, float y) { return cond ? x : y; }
   float2 where(bool2 cond, float2 x, float2 y) { return cond ? x : y; }
