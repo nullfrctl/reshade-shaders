@@ -153,7 +153,7 @@ float3 PS_CAT(std::VS_t VS) : SV_target {
   return color;
 }
 
-technique color < ui_label = "loathe::CAT";
+technique CAT < ui_label = "loathe::CAT";
 > {
   pass {
     PixelShader = PS_CAT;
