@@ -12,46 +12,47 @@
 #include "loathe.fxh"
 
 namespace UI {
-  uniform int std_illuminant_tooltip < ui_label = " ";
-  ui_text = FORMAT("· A" NL
-                   "  incandescent/tungsten;" NL
-                       NL
-                   "· B" NL
-                   "  noon sunlight (obsolote);" NL
-                       NL
-                   "· C" NL
-                   "  north sky daylight (obsolete);" NL
-                       NL
-                   "· D50" NL
-                   "  horizon light;" NL
-                       NL
-                   "· D55" NL
-                   "  mid- morning/afternoon daylight;" NL
-                       NL
-                   "· D65" NL
-                   "  noon daylight---monitor;" NL
-                       NL
-                   "· D75" NL
-                   "  north sky daylight;" NL
-                       NL
-                   "· E" NL
+  uniform int std_illuminant_tooltip < ui_label = SPACE;
+  ui_text = FORMAT(POINT "A" BT
+                   "  incandescent/tungsten;" BT
+                   BT
+                   POINT "B" BT
+                   "  noon sunlight (obsolote);" BT
+                   BT
+                   POINT "C" BT
+                   "  north sky daylight (obsolete);" BT
+                   BT
+                   POINT "D50" BT
+                   "  horizon light;" BT
+                   BT
+                   POINT "D55" BT
+                   "  mid- morning/afternoon daylight;" BT
+                   BT
+                   POINT "D65" BT
+                   "  noon daylight, monitor;" BT
+                   BT
+                   POINT "D75" BT
+                   "  north sky daylight;" BT
+                   BT
+                   POINT "E" BT
                    "  equal energy.");
   ui_type = "radio";
-  ui_category = FORMAT("standard illuminant details");
+  ui_category = HEADER("standard illuminant details");
   > = NULL;
 
   uniform int CAT_method < ui_label = " CAT method.";
   ui_type = "combo";
   ui_items = " · XYZ scaling\0 · von Kries\0 · Bradford\0";
   ui_spacing = THIN;
-  ui_tooltip = FORMAT("the chromatic adaptation matrix or method." NL
-                          NL
-                      " 1. XYZ scaling is simplest, inaccurate;" NL
-                      " 2. von Kries is an older method, accurate-ish;" NL
+  ui_tooltip = FORMAT("the chromatic adaptation matrix/method." BT
+                      BT
+                      " 1. XYZ scaling is simplest, inaccurate;" BT
+                      " 2. von Kries is an older method, accurate-ish;" BT
                       " 3. Bradford is most accurate and newest.");
   > = 2;
 
-#define STD_ILLUMINANT_LIST " · A\0 · B\0 · C\0 · D50\0 · D55\0 · D65\0 · D75\0 · E\0 · custom\0"
+// #define STD_ILLUMINANT_LIST " · A\0 · B\0 · C\0 · D50\0 · D55\0 · D65\0 · D75\0 · E\0 · custom\0"
+#define STD_ILLUMINANT_LIST LI("A") LI("B") LI("C") LI("D50") LI("D55") LI("D65") LI("D75") LI("E") LI("custom")
 
   uniform int input_std_illuminant < ui_label = " input standard illuminant.";
   ui_type = "combo";
@@ -154,6 +155,12 @@ float3 PS_CAT(std::VS_t VS) : SV_target {
 }
 
 technique CAT < ui_label = "loathe::CAT";
+ui_tooltip = FORMAT("chromatic adaptation." BT
+                        BT
+                    " · white point correction;" BT
+                    " · color temperature adjustments." BT
+                        BT
+                            COPYRIGHT_INFO("CAT"));
 > {
   pass {
     PixelShader = PS_CAT;

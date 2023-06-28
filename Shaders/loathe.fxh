@@ -4,13 +4,21 @@
 #include "ReShade.fxh"
 #include "ReShadeUI.fxh"
 
+#define FMT_EXTENDED_NEWLINE
+#include "fmt.fxh"
+#include "utf_8.fxh"
+
 #define NULL (0)
 #define TINY (1e-8)
 
-#define NL " \n "
+#define FORMAT(_str) FMT_WRAP(_str, BT)
+#define HEADER(_str) FORMAT(SECTION_SIGN SPACE _str)
 
-// format for most things (headers, tooltips, text, etc.)
-#define FORMAT(_str) NL _str NL
+#define COPYRIGHT_INFO(_shader) "loathe::" _shader DOUBLE(SPACE) "Copyright" SPACE COPYRIGHT_SIGN SPACE STRINGIZE(2023) DOUBLE(SPACE) "Santiago Velasquez"
+#define POINT FMT_WRAP(MIDDLE_DOT, SPACE)
+#define LI(_str) POINT _str "\0"
+#define TAB "  "
+#define ETAB TAB SPACE // three spaces to match with our use of spaces—this is actually two spaces.
 
 // spacing control; use in ui_spacing = width
 #define THIN 1
