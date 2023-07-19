@@ -32,9 +32,9 @@ namespace CAT {
   float3x3 basic_adaptation_matrix(const float3 source_XYZ, const float3 destination_XYZ, const float3x3 CAT_M, const float3x3 inv_CAT_M) {
     float3 source_LMS = mul(CAT_M, source_XYZ);
     float3 destination_LMS = mul(CAT_M, destination_XYZ);
-    float3x3 x = std::diag(destination_LMS / source_LMS);
+    float3x3 M = std::diag(destination_LMS / source_LMS);
 
-    return mul(inv_CAT_M, mul(x, CAT_M));
+    return mul(inv_CAT_M, mul(M, CAT_M));
   }
 
   float3 XYZ_scaling(const float2 source_white, const float2 destination_white, const float3 XYZ) {
