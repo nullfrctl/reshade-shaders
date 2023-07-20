@@ -1,8 +1,8 @@
 {
   "hlsl.preprocessorDefinitions": {
-    "__FILE__": "",
-    "__FILE_NAME__": "",
-    "__FILE_STEM__": "",
+    "__FILE__": ".\\Blank.fx",
+    "__FILE_NAME__": "Blank.fx",
+    "__FILE_STEM__": "Blank",
     "__LINE__": 0,
     "__RESHADE__": 50100,
     "__APPLICATION__": "0x01000193",
