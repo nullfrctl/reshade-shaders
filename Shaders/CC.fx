@@ -1,5 +1,9 @@
 /* color correction (CC.fx): ACES-based color correction */
 
+#if (__RESHADE__ < 50900)
+#error "ReShade 5.9+ is required."
+#endif
+
 #include "TriDither.fxh"
 #include "aces-hlsl/csc/ACEScct/ACEScsc.Academy.ACES_to_ACEScct.hlsl"
 #include "aces-hlsl/csc/ACEScct/ACEScsc.Academy.ACEScct_to_ACES.hlsl"
@@ -17,17 +21,17 @@
 
 #define CC_LUT_SIZE 32
 
-#if CC_LUT_ENABLED
-texture3D LUT_texture {
+#if (CC_LUT_ENABLED)
+texture3D CC_LUT_texture {
 	Width = CC_LUT_SIZE;
 	Height = CC_LUT_SIZE;
 	Depth = CC_LUT_SIZE;
 };
 
-sampler3D LUT { Texture = LUT_texture; };
+sampler3D CC_LUT { Texture = CC_LUT_texture; };
 
-storage3D LUT_storage {
-	Texture = LUT_texture;
+storage3D CC_LUT_storage {
+	Texture = CC_LUT_texture;
 	MipLevel = 0;
 };
 #endif
@@ -69,8 +73,31 @@ namespace UI {
 	ui_type = "drag";
 	ui_category = CATEGORY;
 	ui_step = 0.01;
-	ui_spacing = 3;
-	> = 1.0;
+	ui_spacing = 2;
+	> = 50.00;
+#undef CATEGORY
+
+#define CATEGORY "RGB mixer"
+	uniform float3 R_mix < ui_label = " Red";
+	ui_type = "color";
+	ui_min = 0.0;
+	ui_max = 1.0;
+	ui_category = CATEGORY;
+	> = float3(0.5, 0.0, 0.0);
+
+	uniform float3 G_mix < ui_label = " Green";
+	ui_type = "color";
+	ui_min = 0.0;
+	ui_max = 1.0;
+	ui_category = CATEGORY;
+	> = float3(0.0, 0.5, 0.0);
+
+	uniform float3 B_mix < ui_label = " Blue";
+	ui_type = "color";
+	ui_min = 0.0;
+	ui_max = 1.0;
+	ui_category = CATEGORY;
+	> = float3(0.0, 0.0, 0.5);
 #undef CATEGORY
 
 #define CATEGORY "Contrast"
@@ -135,19 +162,35 @@ float3 CC(float3 inputCV) {
 	{
 		float3 ACEScct = ACES_to_ACEScct(ACES);
 
+		/* RGB mixer */
+		{
+			const float3 R = UI::R_mix * 2.0;
+			const float3 G = UI::G_mix * 2.0;
+			const float3 B = UI::B_mix * 2.0;
+
+			float src_Y = dot(ACEScct, AP1_RGB2Y);
+			ACEScct = mul(ACEScct, float3x3(R, G, B));
+			float des_Y = dot(ACEScct, AP1_RGB2Y);
+
+			ACEScct = ACEScct - des_Y + src_Y;
+		}
+
 		/* ASC CDL */
 		{
 			/* CDL parameters */
 			const float3 slope = UI::slope + 0.5;
 			const float3 offset = UI::offset - 0.5;
 			const float3 power = UI::power + 0.5;
+			const float saturation = UI::saturation * 2 * 0.01;
 
 			/* https://docs.acescentral.com/specifications/acescct/ */
 			float3 slope_offset = ACEScct * slope + offset;
 			ACEScct = slope_offset <= 0.0 ? slope_offset : pow(slope_offset, power);
 
 			float luma = dot(ACEScct, float3(0.2126, 0.7152, 0.0722));
-			ACEScct = lerp(luma, ACEScct, UI::saturation);
+
+			// ACEScct = luma + saturation * (ACEScct - luma);
+			ACEScct = lerp(luma, ACEScct, saturation);
 		}
 
 		/* contrast */
@@ -175,14 +218,14 @@ void CS_LUT(uint3 threadID : SV_dispatchthreadID) {
 
 	color = CC(color);
 
-	tex3Dstore(LUT_storage, threadID, float4(color, 1.0));
+	tex3Dstore(CC_LUT_storage, threadID, float4(color, 1.0));
 }
 
 float3 PS_apply(std::VS_t VS) : SV_target {
 	float3 color;
 
 	color = tex2D(std::back_buffer, VS.texcoord).rgb;
-	color = tex3D(LUT, color).rgb;
+	color = tex3D(CC_LUT, color).rgb;
 
 	return color;
 }
@@ -195,7 +238,7 @@ float3 PS_CC(std::VS_t VS) : SV_target {
 }
 #endif
 
-technique CC < ui_label = "color correction.";
+technique CC < ui_label = "Color Correction";
 > {
 #if CC_LUT_ENABLED
 	pass {
