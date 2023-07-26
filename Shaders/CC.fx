@@ -15,8 +15,10 @@
 #include "aces-hlsl/rrt/RRT.hlsl"
 #include "stdlib.fxh"
 
+#if (__RENDERER__ >= 0xB000)
 #ifndef CC_LUT_ENABLED
 #define CC_LUT_ENABLED 1
+#endif
 #endif
 
 #define CC_LUT_SIZE 32
@@ -72,7 +74,7 @@ namespace UI {
 	ui_min = 0.0;
 	ui_type = "drag";
 	ui_category = CATEGORY;
-	ui_step = 0.01;
+	ui_step = 0.1;
 	ui_spacing = 2;
 	> = 50.00;
 #undef CATEGORY
