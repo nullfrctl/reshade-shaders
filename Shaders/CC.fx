@@ -118,6 +118,20 @@ namespace UI {
 	ui_category = CATEGORY;
 	ui_step = 0.01;
 	> = 1.0;
+
+	uniform float2 expansion < ui_label = " Expansion";
+	ui_min = 0.0;
+	ui_max = 1.0;
+	ui_type = "slider";
+	ui_category = CATEGORY;
+	> = 0.0;
+
+	uniform float2 compression < ui_label = " Compression";
+	ui_min = 0.0;
+	ui_max = 1.0;
+	ui_type = "slider";
+	ui_category = CATEGORY;
+	> = 0.0;
 #undef CATEGORY
 } // namespace UI
 
@@ -197,8 +211,14 @@ float3 CC(float3 inputCV) {
 
 		/* contrast */
 		{
+			const float2 expansion = float2(UI::expansion.x, 1.0 - UI::expansion.y);
+			const float2 compression = float2(-UI::compression.x, 1.0 + UI::compression.y);
+
 			float middle_grey = lin_to_ACEScct(UI::pivot);
 			ACEScct = lerp(middle_grey, ACEScct, UI::contrast);
+
+			ACEScct = linearstep(expansion.x, expansion.y, ACEScct);
+			ACEScct = linearstep(compression.x, compression.y, ACEScct);
 		}
 
 		ACES = ACEScct_to_ACES(ACEScct);

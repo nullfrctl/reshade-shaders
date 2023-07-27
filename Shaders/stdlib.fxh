@@ -20,6 +20,9 @@
 // C-style NULL
 #define NULL 0
 
+#define where(_condition, _x, _y) ((_condition) ? (_x) : (_y))
+#define linearstep(_min, _max, _x) (saturate(((_x) - (_min)) * rcp((_max) - (_min))))
+
 namespace std {
 	float aspect_ratio() { return BUFFER_WIDTH * BUFFER_RCP_HEIGHT; }
 	float2 pixel_size() { return float2(BUFFER_RCP_WIDTH, BUFFER_RCP_HEIGHT); }
@@ -28,7 +31,7 @@ namespace std {
 	uint bit_depth() { return BUFFER_COLOR_BIT_DEPTH; }
 	uint color_space() { return BUFFER_COLOR_SPACE; }
 
-#include "_where.fxh"
+	// #include "_where.fxh"
 
 	struct VS_t {
 		float4 position : SV_position;
