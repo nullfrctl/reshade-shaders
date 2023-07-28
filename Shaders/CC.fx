@@ -24,18 +24,22 @@
 #define CC_LUT_SIZE 32
 
 #if (CC_LUT_ENABLED)
-texture3D CC_LUT_texture {
-	Width = CC_LUT_SIZE;
-	Height = CC_LUT_SIZE;
-	Depth = CC_LUT_SIZE;
-};
+namespace textures {
+	texture3D CC_LUT {
+		Width = CC_LUT_SIZE;
+		Height = CC_LUT_SIZE;
+		Depth = CC_LUT_SIZE;
+	};
+} // namespace textures
 
-sampler3D CC_LUT { Texture = CC_LUT_texture; };
+namespace storages {
+	storage3D CC_LUT {
+		Texture = textures::CC_LUT;
+		MipLevel = 0;
+	};
+} // namespace storages
 
-storage3D CC_LUT_storage {
-	Texture = CC_LUT_texture;
-	MipLevel = 0;
-};
+sampler3D CC_LUT { Texture = textures::CC_LUT; };
 #endif
 
 uniform int frame_count < source = "framecount";
@@ -240,7 +244,7 @@ void CS_LUT(uint3 threadID : SV_dispatchthreadID) {
 
 	color = CC(color);
 
-	tex3Dstore(CC_LUT_storage, threadID, float4(color, 1.0));
+	tex3Dstore(storages::CC_LUT, threadID, float4(color, 1.0));
 }
 
 float3 PS_apply(std::VS_t VS) : SV_target {
