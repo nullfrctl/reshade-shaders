@@ -7,6 +7,10 @@
 
 Loathesome shaders for ReShade. A successor to [nullFX].
 
+## Shaders
+
+<sup>_more info over at the [Shaders](Shaders) folder…_</sup>
+
 ## Installation
 
 1. Head over to the [Actions] tab and click on the latest entry;
