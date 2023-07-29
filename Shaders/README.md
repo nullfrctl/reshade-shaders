@@ -33,4 +33,5 @@ All of this gives [CC] a varied feature-set, which is:
 <sub>*only on D3D11+ and Vulkan</sub>
 
 ### Images
-_coming soon…_
+
+<sup>_coming soon…_</sup>
