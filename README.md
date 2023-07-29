@@ -4,14 +4,16 @@
 [ACEScg]: https://docs.acescentral.com/specifications/acescg/
 [ACEScct]: https://docs.acescentral.com/specifications/acescct/
 [CC]: https://github.com/nullfrctl/reshade-shaders/blob/main/Shaders/CC.fx
+[nullFX]: https://github.com/nullfrctl/nullFX
 
-# reshade-shaders [<img alt="ReShade" align="right" src="https://github.com/nullfrctl/loathe/assets/99456326/34a349b7-9c7e-4621-a2a9-ca5661931d81" width="56px">](https://reshade.me/)
+# ![reshade-shaders](https://github.com/nullfrctl/reshade-shaders/assets/99456326/963ebed4-bbd5-4e1a-9013-18d04ade4447) [<img alt="ReShade" align="right" src="https://github.com/nullfrctl/loathe/assets/99456326/34a349b7-9c7e-4621-a2a9-ca5661931d81" height="64px">](https://reshade.me/)
 
-Loathesome shaders for ReShade. A successor to nullFX.
+Loathesome shaders for ReShade. A successor to [nullFX]
+.
 
 ## [CC], Color Correction
 
-[ACES]-based color correction shader.
+<sup>[ACES]-based color correction shader.</sup>
 
 The first<sup>[_citation needed_]</sup> ReShade color correction shader which uses [ACES] to its full extent, including:
 - forward and inverse sRGB ODTs;
