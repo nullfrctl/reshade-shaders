@@ -1,35 +1,16 @@
 <!-- @format -->
 
-[ACES]: https://acescentral.com
-[ACEScg]: https://docs.acescentral.com/specifications/acescg/
-[ACEScct]: https://docs.acescentral.com/specifications/acescct/
-[CC]: https://github.com/nullfrctl/reshade-shaders/blob/main/Shaders/CC.fx
 [nullFX]: https://github.com/nullfrctl/nullFX
+[Actions]: https://github.com/nullfrctl/reshade-shaders/actions
 
-# ![reshade-shaders](https://github.com/nullfrctl/reshade-shaders/assets/99456326/963ebed4-bbd5-4e1a-9013-18d04ade4447) [<img alt="ReShade" align="right" src="https://github.com/nullfrctl/loathe/assets/99456326/34a349b7-9c7e-4621-a2a9-ca5661931d81" height="64px">](https://reshade.me/)
+# [![reshade-shaders](https://github.com/nullfrctl/reshade-shaders/assets/99456326/963ebed4-bbd5-4e1a-9013-18d04ade4447)](.) [<img alt="ReShade" align="right" src="https://github.com/nullfrctl/loathe/assets/99456326/34a349b7-9c7e-4621-a2a9-ca5661931d81" height="64px">](https://reshade.me/)
 
-Loathesome shaders for ReShade. A successor to [nullFX]
-.
+Loathesome shaders for ReShade. A successor to [nullFX].
 
-## [CC], Color Correction
+## Installation
 
-<sup>[ACES]-based color correction shader.</sup>
-
-The first<sup>[_citation needed_]</sup> ReShade color correction shader which uses [ACES] to its full extent, including:
-- forward and inverse sRGB ODTs;
-- forward and inverse RRTs;
-- [ACEScct];
-- [ACEScg];
-- ACES 2065-1.
-
-[CC] is also LUT-based, using a compute shader to generate a LUT on-the-fly which can accurately generate HDR data from LDR content using an inverse sRGB ODT and RRT.
-All of this gives [CC] a varied feature-set, which is:
-- HDR exposure (for real, using [ACEScg]);
-- luminance-preserving RGB mixing;
-- cinematic color response (due to RRT and ODT);
-- log-based color correction/grading ([ACEScct]);
-- [ASC CDL](https://en.wikipedia.org/wiki/ASC_CDL) (lift, gamma, gain, which are instead offset, power, slope; also saturation);
-- linear contrast and levels (s-curves coming soon…).
-
-### Images
-_coming soon…_
+1. Head over to the [Actions] tab and click on the latest entry;
+2. navigate to Artifacts and download "reshade-shaders";
+3. extract the downloaded archive somewhere and move the "Shaders" and "Textures" folders into your ReShade installation's "reshade-shaders" folder;
+   - If you don't have a "reshade-shaders" folder you most likely don't have ReShade installed, as such, click on the colorful icon at the top-right and download the ReShade setup files.
+4. launch your game, or if you have it already launched, click the "Reload" button and the shaders should be installed.
