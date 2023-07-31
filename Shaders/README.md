@@ -6,7 +6,7 @@
 [CC]: https://github.com/nullfrctl/reshade-shaders/blob/main/Shaders/CC.fx
 [nullFX]: https://github.com/nullfrctl/nullFXs
 
-# [![reshade-shaders](https://github.com/nullfrctl/reshade-shaders/assets/99456326/963ebed4-bbd5-4e1a-9013-18d04ade4447)](.) [<img alt="ReShade" align="right" src="https://github.com/nullfrctl/loathe/assets/99456326/34a349b7-9c7e-4621-a2a9-ca5661931d81" height="64px">](https://reshade.me/)
+# reshade-shaders [<img alt="ReShade" align="right" src="https://github.com/nullfrctl/loathe/assets/99456326/34a349b7-9c7e-4621-a2a9-ca5661931d81" height="64px">](https://reshade.me/)
 
 Loathesome shaders for ReShade. A successor to [nullFX].
 
