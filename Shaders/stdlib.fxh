@@ -21,7 +21,8 @@
 #define NULL 0
 
 #define where(_condition, _x, _y) ((_condition) ? (_x) : (_y))
-#define linearstep(_min, _max, _x) (saturate(((_x) - (_min)) * rcp((_max) - (_min))))
+#define expand(_min, _max, _x) (((_x) - (_min)) / ((_max) - (_min)))
+#define linearstep(_min, _max, _x) (saturate(expand(_min, _max, _x)))
 
 #define cexp2(_x) (1 << (_x))
 
