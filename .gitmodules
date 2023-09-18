@@ -1,3 +1,0 @@
-[submodule "Shaders/aces-hlsl"]
-	path = Shaders/aces-hlsl
-	url = https://github.com/nullfrctl/aces-hlsl
