@@ -19,11 +19,11 @@ Height = _height
 
 #define NULL 0
 
-#define where(_condition, _x, _y) ((_condition) ? (_x) : (_y))
-#define expand(_min, _max, _x) (((_x) - (_min)) / ((_max) - (_min)))
-#define linearstep(_min, _max, _x) (saturate(expand(_min, _max, _x)))
+#define WHERE(_condition, _x, _y) ((_condition) ? (_x) : (_y))
+#define EXPAND(_min, _max, _x) (((_x) - (_min)) / ((_max) - (_min)))
+#define LINEARSTEP(_min, _max, _x) (saturate(expand(_min, _max, _x)))
 
-#define cexp2(_x) (1 << (_x))
+#define CEXP2(_x) (1 << (_x))
 
 namespace std 
 {
