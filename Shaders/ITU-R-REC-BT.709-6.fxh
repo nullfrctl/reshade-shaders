@@ -34,7 +34,7 @@ static const float3x2 CHROMATICITY_COORDINATES = float3x2(
   0.150, 0.060  // Blue (B)
 );
 
-// Assumed chromaticity for equal primary signals (Reference white)
+// Assumed chromaticity for equal primary signals (Reference white, D65)
 // E_R = E_G = E_B
 static const float2 REFERENCE_WHITE = float2(0.3127, 0.3290);
 
@@ -44,22 +44,23 @@ static const float2 REFERENCE_WHITE = float2(0.3127, 0.3290);
 static const float GAMMA = 0.45
 
 // Derivation of luminance signal E'_Y
-float derive_luminance(float3 Ep_RGB) {
+float derive_luminance(float3 Ep) {
   // E'_Y = 0.2126*E'_R + 0.7152*E'_G + 0.0722*E'_B
-  return dot(Ep_RGB, float3(0.2126, 0.7152, 0.0722));
+  return dot(Ep.rgb, float3(0.2126, 0.7152, 0.0722));
 }
 
 // Derivation of colour-difference signal (analogue coding)
-float derive_Cb(float Ep_RGB) {
+
+float derive_Cb(float3 Ep) {
   // E'_CB = (E'_B - E'Y) / 1.8556
   //       = (-0.2126*E'_R - 0.7152*E'_G + 0.9278*E'_B) / 1.8556
-  return dot(Ep_RGB, float3(-0.2126, -0.7152, 0.9278)) / 1.8556;
+  return dot(Ep.rgb, float3(-0.2126, -0.7152, 0.9278)) / 1.8556;
 }
 
-float derive_Cr(float Ep_RGB) {
+float derive_Cr(float3 Ep) {
   // E'_CR = (E'_R - E'_Y) / 1.5748
   //       = (0.7874*E'_R - 0.7152*E'_G - 0.0722*E'_B) / 1.5748
-  return dot(Ep_RGB, float3(0.7874, -0.7152, -0.0722)) / 1.5748;
+  return dot(Ep.rgb, float3(0.7874, -0.7152, -0.0722)) / 1.5748;
 }
 
 // Quantization of RGB, luminance, and colour-difference signals.
@@ -67,8 +68,8 @@ float derive_Cr(float Ep_RGB) {
 /* "The operator INT returns the value of 0 for fractional parts in the range of
  * 0 to 0.4999... and +1 for fractional parts in the range of 0.5 to 0.999...,
  * i.e. it rounds up fractions above 0.5." */
-float INT(float f) {
-  return f >= 0.5 ? ceil(f) : floor(f);
+float INT(float n) {
+  return n >= 0.5 ? ceil(n) : floor(n);
 }
 
 /* "'n' denotes the number of the bit length of the quantized signal" */
