@@ -1,0 +1,24 @@
+                                                          [  a n a g r a m a  ]
+_______________________________________________________________________________
+
+Programs for ReShade (https://reshade.me).
+
+PROGRAMS
+
+The Programs included in the Collection.  They are accompanied by their perfor-
+mance cost in frametime, calculated at 4k resolution.
+
+i. Blur [1ms]:
+self-explanatory.  Blurs the image using a 6-pass dual filter blur. Can be
+used for simulating lens diffusion filters.
+  
+ii. Hyperblur [2.5ms]:
+not self-explanatory.  Blurs the image using separate passes of a dual filter
+blur.  Without diving into technicalities, this means it preserves small-
+scale *and* large-scale blur... with the sacrifice of it taking up about twice
+the performance cost as 'Blur.'  Very, very good at simulating bloom; looks
+great.
+
+COPYRIGHT
+
+(C) 2024 -- Santiago Velasquez.  All Rights Reserved.
