@@ -6,7 +6,7 @@ Programs for ReShade (https://reshade.me).
 PROGRAMS
 
 The Programs included in the Collection.  They are accompanied by their perfor-
-mance cost in frametime, calculated at 4k resolution.
+mance cost in frametime, calculated at 4k resolution on an NVIDIA RTX 3070 GPU.
 
 i. Blur [1ms]:
 self-explanatory.  Blurs the image using a 6-pass dual filter blur. Can be

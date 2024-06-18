@@ -1,3 +1,9 @@
+/*
+
+  [  a n a g r a m a  ]
+
+                         */
+
 #include "ReShade.fxh"
 #include "ReShadeUI.fxh"
 #include "sampling.fxh"
@@ -14,10 +20,6 @@ uniform float2 Offset < __UNIFORM_DRAG_FLOAT2
   ui_label = "Offset.";
   ui_tooltip = "Changes the size of a 'pixel' in the blur calculation. Bigger values result in wider blur.";
 > = 1;
-
-#ifndef DEBAND
-  #define DEBAND 1
-#endif
 
 /* § Textures and Samplers. */
 
