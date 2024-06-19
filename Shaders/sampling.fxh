@@ -7,7 +7,7 @@ namespace Dual
 
   float3 downsample(in sampler2D T, in float2 texcoord, in uint n, in float2 offset)
   {
-    const float2 px = float2(BUFFER_RCP_WIDTH, BUFFER_RCP_HEIGHT) * exp2(n) * offset;
+    const float2 px = float2(BUFFER_RCP_WIDTH, BUFFER_RCP_HEIGHT) * (1 << n) * offset;
     const float2 hpx = (px/2);
 
     float3 sum = tex2D(T, texcoord.xy).rgb * 4;
@@ -26,7 +26,7 @@ namespace Dual
 
   float3 upsample(in sampler2D T, in float2 texcoord, in uint n, in float2 offset)
   {
-    const float2 px = float2(BUFFER_RCP_WIDTH, BUFFER_RCP_HEIGHT) * exp2(n) * offset;
+    const float2 px = float2(BUFFER_RCP_WIDTH, BUFFER_RCP_HEIGHT) * (1 << n) * offset;
     const float2 hpx = (px/2);
 
     float3 sum = tex2D(T, texcoord + float2(-px.x,0)).rgb;

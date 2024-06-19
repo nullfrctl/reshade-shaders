@@ -11,16 +11,37 @@
 uniform float Blend < __UNIFORM_SLIDER_FLOAT1
   ui_min = 0;
   ui_max = 1;
-  ui_label = "Blend.";
+  ui_label = " Blend.";
   ui_tooltip = "Blends between the blur and the original image. Can be used for lens diffusion.";
+  ui_spacing = 4;
 > = 1;
+
+uniform float W < __UNIFORM_DRAG_FLOAT1
+  ui_min = 1;
+  ui_max = 3;
+  ui_label = " Log HDR whitepoint.";
+  ui_tooltip = "The largest attainable HDR value in 10^n scale.";
+> = 2;
 
 uniform float2 Offset < __UNIFORM_DRAG_FLOAT2
   ui_min = 1;
-  ui_label = "Offset.";
+  ui_label = " Offset.";
   ui_tooltip = "Changes the size of a 'pixel' in the blur calculation. Bigger values result in wider blur.";
+  ui_spacing = 4;
 > = 1;
 
+uniform bool Aphysical < __UNIFORM_COMBO_BOOL1
+  ui_label = " Aphysical blend.";
+  ui_spacing = 4;
+  ui_tooltip = "Blends the blur in a way closer to how games often (wrongly) blend bloom: additively.\n"
+               "This mode is not additive, but likewise allows for thresholds [see below].";
+> = false;
+
+uniform float Threshold < __UNIFORM_DRAG_FLOAT1
+  ui_min = 0;
+  ui_label = " Aphysical threshold.";
+  ui_tooltip = "An amount of light which must be reached for the blur to recognize it. Not physically correct.";
+> = 10;
 /* § Textures and Samplers. */
 
 sampler2D back_buffer
@@ -100,7 +121,7 @@ float3 Zf(float4 p)
 }
 
 float3 tone_map(float3 c) { return c / (1+c); }
-float3 inverse_tone_map(float3 c) { return -(c / (c-1.01)); }
+float3 inverse_tone_map(float3 c) { return -(c / (c-(1+pow(10,-W)))); }
 
 /* § Shaders. */
 
@@ -172,7 +193,15 @@ namespace u
 
 float3 InverseToneMapPS(float4 position : SV_Position, float2 texcoord : TEXCOORD) : SV_Target
 {
-  return inverse_tone_map(fetch(back_buffer, position).rgb);
+  float3 c = inverse_tone_map(fetch(back_buffer, position).rgb);
+
+  if (Aphysical)
+  {  
+    float br = max(c.r,max(c.g,c.b));
+    c *= max(0, br - Threshold) / max(br, 1e-5);
+  }
+  
+  return c;
 }
 
 float3 BlendPS(in float4 position : SV_Position, in float2 texcoord : TEXCOORD) : SV_Target
@@ -180,7 +209,13 @@ float3 BlendPS(in float4 position : SV_Position, in float2 texcoord : TEXCOORD) 
   float3 hdr  = inverse_tone_map(fetch(back_buffer, position).rgb);
   float3 blur = Zf(position);
 
-  float3 color = lerp(hdr, blur, Blend);
+  float3 color;
+  
+  if (Aphysical)
+    color = lerp(hdr, (hdr + (blur / (1 + blur))), Blend);
+  else
+    color = lerp(hdr, blur, Blend);
+    
   return tone_map(color);
 }
 

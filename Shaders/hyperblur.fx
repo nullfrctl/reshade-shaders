@@ -16,6 +16,13 @@ uniform float Blend < __UNIFORM_SLIDER_FLOAT1
   ui_spacing = 4;
 > = 1.0;
 
+uniform float W < __UNIFORM_DRAG_FLOAT1
+  ui_min = 1;
+  ui_max = 3;
+  ui_label = " Log HDR Whitepoint.";
+  ui_tooltip = "The largest attainable value in HDR in 10^n scale.";
+> = 2;
+
 uniform float2 Offset < __UNIFORM_DRAG_FLOAT2
   ui_min = 1;
   ui_label = " Offset.";
@@ -23,6 +30,12 @@ uniform float2 Offset < __UNIFORM_DRAG_FLOAT2
   ui_spacing = 4;
 > = 1;
 
+// We're gonna use hardware blending.
+#define BLEND_STATEMENT ClearRenderTargets = false; \
+                        BlendEnable = true;         \
+                        BlendOp = ADD;              \
+                        SrcBlend = ONE;             \
+                        DestBlend = ONE
 
 /* § Textures and Samplers. */
 
@@ -100,11 +113,16 @@ float3 Zf(float4 p)
   return tex2Dfetch(Z, uint2(p.xy)).rgb;
 }
 
+float4 a1(float3 c)
+{
+  return float4(c,1);
+}
+
 namespace u1
 {
   float3 I(float4 _ : SV_Position, float2 t : TEXCOORD) : SV_Target
   {
-    return Zf(_) + ::Dual::upsample(::I, t, 1, Offset);
+    return ::Dual::upsample(::I, t, 1, Offset);
   }
 }
 
@@ -116,9 +134,9 @@ namespace u2
     return ::Dual::upsample(::II, t, 2, Offset);
   }
 
-  float3 II(float4 _ : SV_Position, float2 t : TEXCOORD) : SV_Target
+float3 II(float4 _ : SV_Position, float2 t : TEXCOORD) : SV_Target
   {
-    return Zf(_) + ::Dual::upsample(::I, t, 1, Offset);
+    return ::Dual::upsample(::I, t, 1, Offset);
   }
 }
 
@@ -136,7 +154,7 @@ namespace u3
 
   float3 III(float4 _ : SV_Position, float2 t : TEXCOORD) : SV_Target
   {
-    return Zf(_) + ::Dual::upsample(::I, t, 1, Offset);
+    return ::Dual::upsample(::I, t, 1, Offset);
   }
 }
 
@@ -160,7 +178,7 @@ namespace u4
 
   float3 IV(float4 _ : SV_Position, float2 t : TEXCOORD) : SV_Target
   {
-    return Zf(_) + ::Dual::upsample(::I, t, 1, Offset);
+    return ::Dual::upsample(::I, t, 1, Offset);
   }
 }
 
@@ -189,7 +207,7 @@ namespace u5
 
   float3 V(float4 _ : SV_Position, float2 t : TEXCOORD) : SV_Target
   {
-    return Zf(_) + ::Dual::upsample(::I, t, 1, Offset);
+    return ::Dual::upsample(::I, t, 1, Offset);
   }
 }
 
@@ -222,7 +240,7 @@ namespace u6
 
   float3 VI(float4 _ : SV_Position, float2 t : TEXCOORD) : SV_Target
   {
-    return Zf(_) + ::Dual::upsample(::I, t, 1, Offset);
+    return ::Dual::upsample(::I, t, 1, Offset);
   }
 }
 
@@ -291,7 +309,7 @@ namespace d
 }
 
 float3 tone_map(float3 c) { return c / (1+c); }
-float3 inverse_tone_map(float3 c) { return -(c / (c-1.01)); }
+float3 inverse_tone_map(float3 c) { return -(c / (c-(1+pow(10,-W)))); }
 
 void InverseToneMapPS
 (
@@ -300,7 +318,7 @@ void InverseToneMapPS
   out float4 hdr     : SV_Target0
 )
 {
-  hdr = float4(inverse_tone_map(tex2Dfetch(back_buffer, uint2(position.xy)).rgb), 1);
+  hdr = a1(inverse_tone_map(tex2Dfetch(back_buffer, uint2(position.xy)).rgb));
 }
 
 float3 HyperblendPS(in float4 position : SV_Position, in float2 texcoord : TEXCOORD) : SV_Target
@@ -383,6 +401,7 @@ technique Hyperblur
     VertexShader = PostProcessVS;
     PixelShader  = u1::I;
     RenderTarget = T::Z;
+    BLEND_STATEMENT;
   }
 
   /* U-group two. */
@@ -399,6 +418,7 @@ technique Hyperblur
     VertexShader = PostProcessVS;
     PixelShader  = u2::II;
     RenderTarget = T::Z;
+    BLEND_STATEMENT;
   }
 
   /* U-group three. */
@@ -422,6 +442,7 @@ technique Hyperblur
     VertexShader = PostProcessVS;
     PixelShader  = u3::III;
     RenderTarget = T::Z;
+    BLEND_STATEMENT;
   }
 
   /* U-group four. */
@@ -452,6 +473,7 @@ technique Hyperblur
     VertexShader = PostProcessVS;
     PixelShader  = u4::IV;
     RenderTarget = T::Z;
+    BLEND_STATEMENT;
   }
 
   /* U-group five. */
@@ -489,6 +511,7 @@ technique Hyperblur
     VertexShader = PostProcessVS;
     PixelShader  = u5::V;
     RenderTarget = T::Z;
+    BLEND_STATEMENT;
   }
 
   /* U-group six. */
@@ -533,6 +556,7 @@ technique Hyperblur
     VertexShader = PostProcessVS;
     PixelShader  = u6::VI;
     RenderTarget = T::Z;
+    BLEND_STATEMENT;
   }
 
   /* Finalization. */
