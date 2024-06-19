@@ -19,6 +19,12 @@ scale *and* large-scale blur... with the sacrifice of it taking up about twice
 the performance cost as 'Blur.'  Very, very good at simulating bloom; looks
 great.
 
+iii. Anamorpho [0.5ms]:
+allows the simulation of the anamorphic process by likewise squeezing the
+image, and then desqueezing the image. This allows for natural, filmic soft-
+ness and for effects like bloom (hyperblur) to behave as they would with an
+anamorphic lens. For experts.
+
 COPYRIGHT
 
 (C) 2024 -- Santiago Velasquez.  All Rights Reserved.

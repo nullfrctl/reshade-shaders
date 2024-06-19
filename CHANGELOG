@@ -1,0 +1,21 @@
+CHANGES   to the Anagrama shader collection.
+_______________________________________________________________________________
+
+Jun. 17, XXIV:
+
+A total restructuring to this repository, adopting the new name of Anagrama.
+
+---
+
+Jun. 19, XXIV [7226356]:
+
+- Added aphysical blending to Blur, which allows for the use of thresholds,
+whereby the simulation of highlight diffusion filters is eased.  Not additive
+blending.
+
+- Created the Anamorpho program.  It simulates the anamorphic process in form
+of a shader to let different effects look as they would under a real anamorphic
+lens.  Writes to the backbuffer; requires two techniques: one to squeeze, the
+second to desqueeze.
+
+...
