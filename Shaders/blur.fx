@@ -8,13 +8,15 @@
 #include "ReShadeUI.fxh"
 #include "sampling.fxh"
 
+/* § User Interface. */
+
 uniform float Blend < __UNIFORM_SLIDER_FLOAT1
   ui_min = 0;
   ui_max = 1;
   ui_label = " Blend.";
   ui_tooltip = "Blends between the blur and the original image. Can be used for lens diffusion.";
   ui_spacing = 4;
-> = 1;
+> = 0.5;
 
 uniform float W < __UNIFORM_DRAG_FLOAT1
   ui_min = 1;
@@ -42,6 +44,7 @@ uniform float Threshold < __UNIFORM_DRAG_FLOAT1
   ui_label = " Aphysical threshold.";
   ui_tooltip = "An amount of light which must be reached for the blur to recognize it. Not physically correct.";
 > = 10;
+
 /* § Textures and Samplers. */
 
 sampler2D back_buffer
@@ -221,9 +224,11 @@ float3 BlendPS(in float4 position : SV_Position, in float2 texcoord : TEXCOORD) 
 
 technique Blur
 <
-  ui_label = "anagrama blur.";
+  ui_label = "blur (lens diffusion).";
   ui_tooltip = "A simple, quick blur shader apt at simulating lens diffusion. \n"
-               "Part of the Anagrama shader collection [nullfrctl/reshade-shaders].";
+               "Part of the Anagrama shader collection [nullfrctl/reshade-shaders].\n"
+               "\n"
+               "(C) 2024 Santiago Velasquez. All Rights Reserved.";
 >
 {
   /* Initialization. */

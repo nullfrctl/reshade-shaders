@@ -8,6 +8,8 @@
 #include "ReShadeUI.fxh"
 #include "sampling.fxh"
 
+/* § User Interface. */
+
 uniform float Blend < __UNIFORM_SLIDER_FLOAT1
   ui_min = 0;
   ui_max = 1;
@@ -117,6 +119,8 @@ float4 a1(float3 c)
 {
   return float4(c,1);
 }
+
+/* § Shaders. */
 
 namespace u1
 {
@@ -335,7 +339,7 @@ float3 HyperblendPS(in float4 position : SV_Position, in float2 texcoord : TEXCO
 
 technique Hyperblur
 <
-  ui_label = "anagrama hyperblur.";
+  ui_label = "hyperblur (bloom).";
   ui_tooltip = "A special and perfectionist blur shader specialized for bloom. \n"
                "Part of the Anagrama shader collection [nullfrctl/reshade-shaders].";
 >
