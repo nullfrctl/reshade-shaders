@@ -18,4 +18,12 @@ of a shader to let different effects look as they would under a real anamorphic
 lens.  Writes to the backbuffer; requires two techniques: one to squeeze, the
 second to desqueeze.
 
+---
+
+Jun. 21, XXIV [9e0dac4]:
+
+- Added blue noise dither to Blur and Hyperblur to reduce banding.
+
+- Changed Anamorpho UI.
+
 ...
