@@ -32,6 +32,11 @@ uniform float2 Offset < __UNIFORM_DRAG_FLOAT2
   ui_spacing = 4;
 > = 1;
 
+uniform bool Dither <
+  ui_label = " Debanding.";
+  ui_spacing = 4;
+> = true;
+
 // We're gonna use hardware blending.
 #define BLEND_STATEMENT ClearRenderTargets = false; \
                         BlendEnable = true;         \
@@ -99,15 +104,34 @@ namespace T
     Height = BUFFER_HEIGHT / 64;
     Format = RGBA16F;
   };
+
+  texture2D blue_noise
+  <
+    source = "blue_noise.dds";
+  >
+  {
+    Width = 512;
+    Height = 512;
+    Format = R8;
+  };
 }
 
-sampler2D Z   { Texture = T::Z;   };
-sampler2D I   { Texture = T::I;   };
-sampler2D II  { Texture = T::II;  };
-sampler2D III { Texture = T::III; };
-sampler2D IV  { Texture = T::IV;  };
-sampler2D V   { Texture = T::V;   };
-sampler2D VI  { Texture = T::VI;  };
+#define MIRROR AddressU = MIRROR; AddressV = MIRROR
+
+sampler2D Z   { Texture = T::Z;   MIRROR; };
+sampler2D I   { Texture = T::I;   MIRROR; };
+sampler2D II  { Texture = T::II;  MIRROR; };
+sampler2D III { Texture = T::III; MIRROR; };
+sampler2D IV  { Texture = T::IV;  MIRROR; };
+sampler2D V   { Texture = T::V;   MIRROR; };
+sampler2D VI  { Texture = T::VI;  MIRROR; };
+
+sampler2D blue_noise  
+{
+  Texture = T::blue_noise;
+  AddressU = REPEAT;
+  AddressV = REPEAT;
+};
 
 // Z fetch.
 float3 Zf(float4 p)
@@ -327,9 +351,10 @@ void InverseToneMapPS
 
 float3 HyperblendPS(in float4 position : SV_Position, in float2 texcoord : TEXCOORD) : SV_Target
 {
-  uint2 p = uint2(position.xy);
+  if (Dither)
+    position.xy += fetch(blue_noise, position).rr - 0.5;
 
-  float3 hdr  = inverse_tone_map(tex2Dfetch(back_buffer, p).rgb);
+  float3 hdr  = inverse_tone_map(fetch(back_buffer, position).rgb);
   float3 blur = Zf(position) / 6;
 
   float3 color = lerp(hdr, blur, Blend);

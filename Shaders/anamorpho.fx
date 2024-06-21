@@ -12,7 +12,20 @@
 
 /* § User Interface. */
 
+uniform uint HELP < __UNIFORM_RADIO_INT1
+  ui_spacing = 4;
+  ui_label = " ";
+  ui_category = " INSTRUCTIONS";
+  ui_category_closed = true;
+  ui_text = "i.  To use Anamorpho, you must place the Squeeze technique at the very top of the shaders you want to take on an anamorphic format. These should be shaders that manipulate color or add only post-processing effects and NOT depth-based ones like GI, AO, etc.\n"
+            "\n"
+            "ii. Then, after all of these have been put after the Squeeze technique, enable the Desqueeze technique. Once both are enabled, image should go back to normal and look as it should, only that the desired effects have been distorted in a way alike to how they'd behave under an anamorphic lens.\n"
+            "\n"
+            "    This process incurs a slight amount of blur (especially at higher squeeze factors), so running at a higher resolution is recommended for the best results.";
+>;
+
 uniform float SqueezeFactor < __UNIFORM_DRAG_FLOAT1
+  ui_spacing = 4;
   ui_min = 1.333;
   ui_max = 2;
   ui_label = " Squeeze factor.";
@@ -22,11 +35,14 @@ uniform float2 FilmDimensions < __UNIFORM_DRAG_FLOAT2
   ui_min = float2(4,3);
   ui_label = " Film dimensions.";
   ui_units = "mm";
+  ui_tooltip = "Allows you to select the simulated dimensions of the film used in the anamorphic process.\n"
+               "Useful with crop enabled.";
+  ui_spacing = 4;
 > = float2(21.95,18.6);
 
-uniform bool Letterbox <
-  ui_label = " Letterbox.";
-  ui_tooltip = "Adds a letterbox simulating the anamorphic aspect ratio of the selected film format";
+uniform bool Letterbox < __UNIFORM_COMBO_BOOL1
+  ui_label = " Crop.";
+  ui_tooltip = "Adds a letterbox (or pillarbox) simulating the anamorphic aspect ratio of the selected film.";
 > = false;
 
 /* § Textures and Samplers. */
